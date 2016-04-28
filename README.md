@@ -11,6 +11,7 @@ There are two format/encode ways: one is to access each field with two index, th
 an interface `Conv'. 
 For example:
 
+```go
 package main
 
 import (
@@ -50,3 +51,5 @@ func main() {
 		xl.WriteString(out, tab.Encode(c))
 	}
 }
+
+```
