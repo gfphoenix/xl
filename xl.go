@@ -92,24 +92,26 @@ func (t *Tab) Encode(fn Conv) string {
 	return fn.Merge(rows)
 }
 
-// example for encoder
-type DummyEncoder struct {
+type I bool
+type Comma bool 
+type N bool
+func (i I)Field(r,c int, value string)string{
+    return value
 }
-
-func (s *DummyEncoder) Field(row, col int, value string) string {
-	return value
+func (c Comma)Line(row int, fields []string)string {
+    if len(fields)==0 {
+        return ""
+    }
+    s := fields[0]
+    for j:=1; j<len(fields); j++ {
+        s += ","+fields[j]
+    }
+    return s
 }
-func (se *DummyEncoder) Line(row int, fields []string) string {
-	s := ""
-	for _, v := range fields {
-		s += v + ","
-	}
-	return s
-}
-func (se *DummyEncoder) Merge(lines []string) string {
-	s := ""
-	for _, v := range lines {
-		s += v + "\n"
-	}
-	return s
+func (m N)Merge(lines []string) string {
+    s := ""
+    for _, value := range lines {
+        s += value+"\n"
+    }
+    return s
 }
