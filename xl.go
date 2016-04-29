@@ -95,9 +95,11 @@ func (t *Tab) Encode(fn Conv) string {
 type I bool
 type Comma bool 
 type N bool
+// identity process, return the value itself
 func (i I)Field(r,c int, value string)string{
     return value
 }
+// catenate fields by ','
 func (c Comma)Line(row int, fields []string)string {
     if len(fields)==0 {
         return ""
@@ -108,6 +110,7 @@ func (c Comma)Line(row int, fields []string)string {
     }
     return s
 }
+// append '\n' after each line and catenate them
 func (m N)Merge(lines []string) string {
     s := ""
     for _, value := range lines {
