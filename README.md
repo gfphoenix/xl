@@ -9,6 +9,16 @@ RowSize() , ColSize(), At(row, col) .
 
 There are two format/encode ways: one is to access each field with two index, the other way is to implement
 an interface `Conv'. 
+
+How To Use It
+=============
+1. make use you have installed go-lang package, and set GOROOT correctly.
+2. make a directory for your workspace, like mkdir workspace && cd workspace
+3. get this package and its dependency by GOPATH=`pwd` go get github.com/gfphoenix/xl
+4. start coding your formatter.
+
+Example
+-------
 For example:
 
 ```go
@@ -18,17 +28,17 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"xl"
+	"github.com/gfphoenix/xl"
 )
 
 type Csv struct{}
 
-func (c Csv) Field(i int, value string) string {
+func (c Csv) Field(row, col int, value string) string {
 	value = strings.Replace(value, "“", "\"", -1)
 	value = strings.Replace(value, "”", "\"", -1)
 	return value
 }
-func (c Csv) Line(fields []string) string {
+func (c Csv) Line(row int, fields []string) string {
 	s := fields[0]
 	for j := 1; j < len(fields); j++ {
 		s += "," + fields[j]
