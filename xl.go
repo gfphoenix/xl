@@ -2,9 +2,10 @@ package xl
 
 import (
 	"fmt"
+	"github.com/tealeg/xlsx"
 	"log"
 	"os"
-	"github.com/tealeg/xlsx"
+	//"xlsx"
 )
 
 type Tab struct {
@@ -33,11 +34,11 @@ func Open(file string, sheet int) *Tab {
 	}
 	rows := f.Sheets[sheet].Rows
 	header := rows2Names(rows[0])
-	fmt.Println("col size = ", len(header))
 	t := &Tab{
 		Header: header,
 		rows:   rows[1:],
 	}
+	fmt.Printf("table size = %d x %d\n", len(t.rows), len(header))
 	return t
 }
 func (t *Tab) RowSize() int {
@@ -47,10 +48,14 @@ func (t *Tab) ColSize() int {
 	return len(t.Header)
 }
 func (t *Tab) At(row, col int) string {
-	if row < 0 || col < 0 || row >= t.RowSize() || col >= t.ColSize() {
+	if row < 0 || col < 0 || row >= t.RowSize() {
 		log.Fatalf("invalid index = (%d, %d) - row=%d, col=%d\n", row, col, t.RowSize(), t.ColSize())
 	}
-	return t.rows[row].Cells[col].Value
+	cells := t.rows[row].Cells
+	if len(cells) <= col {
+		return ""
+	}
+	return cells[col].Value
 }
 func WriteString(outFileName, data string) {
 	file, err := os.OpenFile(outFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
@@ -64,10 +69,10 @@ func WriteString(outFileName, data string) {
 }
 
 type Conv interface {
-	// 转换第index列数据
-	Field(index int, value string) string
+	// 转换第(row, col)单元格数据
+	Field(row, col int, value string) string
 	// 将一行数据转化为一个对象的字符串
-	Line(fields []string) string
+	Line(row int, fields []string) string
 	// 将所有对象的字符串转化为一个文档字符串
 	Merge(lines []string) string
 }
@@ -76,16 +81,13 @@ func (t *Tab) Encode(fn Conv) string {
 	R := t.RowSize()
 	N := t.ColSize()
 	rows := make([]string, 0, R)
-	for i := 0; i < R; i++ {
-		cells := t.rows[i].Cells
-		if len(cells) > 0 {
-			line := make([]string, N)
-			line[0] = fn.Field(0, cells[0].Value)
-			for j := 1; j < N; j++ {
-				line[j] = fn.Field(j, cells[j].Value)
-			}
-			rows = append(rows, fn.Line(line))
+	line := make([]string, 0, N)
+	for row := 0; row < R; row++ {
+		for col := 0; col < N; col++ {
+			line = append(line, fn.Field(row, col, t.At(row, col)))
 		}
+		rows = append(rows, fn.Line(row, line))
+		line = line[0:0]
 	}
 	return fn.Merge(rows)
 }
@@ -94,10 +96,10 @@ func (t *Tab) Encode(fn Conv) string {
 type DummyEncoder struct {
 }
 
-func (s *DummyEncoder) Field(i int, value string) string {
+func (s *DummyEncoder) Field(row, col int, value string) string {
 	return value
 }
-func (se *DummyEncoder) Line(fields []string) string {
+func (se *DummyEncoder) Line(row int, fields []string) string {
 	s := ""
 	for _, v := range fields {
 		s += v + ","
