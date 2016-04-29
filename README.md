@@ -5,16 +5,22 @@ The provided interface is pretty simple, but give you full control.
 
 # Table
 The table sheet has an exported field, Header, and 3 functions to access data:
-RowSize() , ColSize(), At(row, col) .
+``` RowSize() ``` , ``` ColSize() ```, ``` At(row, col) ```.
 
 There are two format/encode ways: one is to access each field with two index, the other way is to implement
-an interface `Conv'. 
+an interface ``` Conv ```. 
 
 How To Use It
 =============
 1. make use you have installed go-lang package, and set GOROOT correctly.
-2. make a directory for your workspace, like mkdir workspace && cd workspace
-3. get this package and its dependency by GOPATH=`pwd` go get github.com/gfphoenix/xl
+2. make a directory for your workspace, like 
+	```
+	mkdir workspace && cd workspace
+	```
+3. get this package and its dependency by 
+ 	```
+	GOPATH=`pwd` go get github.com/gfphoenix/xl
+	```
 4. start coding your formatter.
 
 Example
