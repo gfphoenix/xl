@@ -99,6 +99,16 @@ type N bool
 func (i I)Field(r,c int, value string)string{
     return value
 }
+func StringField(value string) string{
+    value = strings.TrimSpace(value)
+    if len(value) == 0 {
+        return ""
+    }
+    if value[0]!='"' {
+        value = `"` + value + `"`
+    }
+    return value
+}
 // catenate fields by ','
 func (c Comma)Line(row int, fields []string)string {
     if len(fields)==0 {
